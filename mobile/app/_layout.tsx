@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../store/authStore';
@@ -9,6 +9,7 @@ const queryClient = new QueryClient();
 function AuthGate() {
   const router = useRouter();
   const segments = useSegments();
+  const navState = useRootNavigationState();
   const { session, initialized, setSession, setInitialized } = useAuthStore();
 
   useEffect(() => {
@@ -25,7 +26,7 @@ function AuthGate() {
   }, []);
 
   useEffect(() => {
-    if (!initialized) return;
+    if (!navState?.key || !initialized) return;
 
     const inAuthGroup = segments[0] === '(auth)';
 
@@ -34,7 +35,7 @@ function AuthGate() {
     } else if (session && inAuthGroup) {
       router.replace('/(tabs)');
     }
-  }, [session, initialized, segments]);
+  }, [session, initialized, segments, navState?.key]);
 
   return null;
 }
