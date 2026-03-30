@@ -44,7 +44,14 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthGate />
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="create-match"
+          options={{ presentation: 'modal', title: 'Créer un match', headerShown: true, headerTintColor: '#16a34a' }}
+        />
+      </Stack>
     </QueryClientProvider>
   );
 }
