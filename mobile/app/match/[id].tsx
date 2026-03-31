@@ -1,5 +1,6 @@
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Share } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import * as Linking from 'expo-linking';
 import { useMatch } from '../../hooks/useMatch';
 import { useJoinMatch, useLeaveMatch } from '../../hooks/useParticipate';
 import { useCancelMatch } from '../../hooks/useCancelMatch';
@@ -38,6 +39,17 @@ export default function MatchDetailScreen() {
   const myParticipation = match.participations.find((p) => p.user.id === user?.id);
   const isCreator = match.creator_id === user?.id;
   const isFull = confirmed.length >= match.max_players;
+
+  async function handleShare() {
+    const url = Linking.createURL(`/match/${id}`);
+    const date = new Date(match!.scheduled_at).toLocaleDateString('fr-FR', {
+      weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
+    });
+    await Share.share({
+      message: `Rejoins mon match de foot sur Pokta !\n${match!.format} · ${date}\n${url}`,
+      url,
+    });
+  }
 
   async function handleJoin() {
     try {
@@ -88,6 +100,9 @@ export default function MatchDetailScreen() {
           <View style={[styles.statusBadge, match.status === 'complet' && styles.statusFull]}>
             <Text style={styles.statusText}>{match.status === 'complet' ? 'Complet' : 'Ouvert'}</Text>
           </View>
+          <TouchableOpacity style={styles.shareBtn} onPress={handleShare}>
+            <Text style={styles.shareBtnText}>Partager</Text>
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.date}>{formatDate(match.scheduled_at)}</Text>
@@ -210,5 +225,7 @@ const styles = StyleSheet.create({
   ctaBtnSecondary: { backgroundColor: '#f59e0b' },
   ctaBtnLeave: { backgroundColor: '#dc2626', borderRadius: 10, padding: 16, alignItems: 'center' },
   ctaBtnCancel: { backgroundColor: '#dc2626', borderRadius: 10, padding: 16, alignItems: 'center', marginTop: 8 },
+  shareBtn: { marginLeft: 'auto', paddingVertical: 4, paddingHorizontal: 10, borderRadius: 6, borderWidth: 1, borderColor: '#16a34a' },
+  shareBtnText: { fontSize: 13, color: '#16a34a', fontWeight: '600' },
   ctaText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });
