@@ -2,6 +2,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMatch } from '../../hooks/useMatch';
 import { useJoinMatch, useLeaveMatch } from '../../hooks/useParticipate';
+import { useCancelMatch } from '../../hooks/useCancelMatch';
 import { useAuthStore } from '../../store/authStore';
 
 const LEVEL_LABEL: Record<string, string> = {
@@ -23,6 +24,7 @@ export default function MatchDetailScreen() {
   const { data: match, isLoading, error } = useMatch(id);
   const join = useJoinMatch(id);
   const leave = useLeaveMatch(id);
+  const cancel = useCancelMatch(id);
 
   if (isLoading) {
     return <View style={styles.centered}><ActivityIndicator size="large" color="#16a34a" /></View>;
@@ -43,6 +45,20 @@ export default function MatchDetailScreen() {
     } catch (e: any) {
       Alert.alert('Erreur', e.message);
     }
+  }
+
+  async function handleCancel() {
+    Alert.alert('Annuler le match', 'Tous les joueurs inscrits seront prévenus. Cette action est irréversible.', [
+      { text: 'Retour', style: 'cancel' },
+      { text: 'Annuler le match', style: 'destructive', onPress: async () => {
+        try {
+          await cancel.mutateAsync();
+          router.back();
+        } catch (e: any) {
+          Alert.alert('Erreur', e.message);
+        }
+      }},
+    ]);
   }
 
   async function handleLeave() {
@@ -133,6 +149,15 @@ export default function MatchDetailScreen() {
 
       {/* CTA */}
       <View style={styles.footer}>
+        {isCreator && match.status !== 'annule' && (
+          <TouchableOpacity style={styles.ctaBtnCancel} onPress={handleCancel} disabled={cancel.isPending}>
+            {cancel.isPending
+              ? <ActivityIndicator color="#fff" />
+              : <Text style={styles.ctaText}>Annuler le match</Text>
+            }
+          </TouchableOpacity>
+        )}
+
           {!myParticipation ? (
             <TouchableOpacity
               style={[styles.ctaBtn, isFull && styles.ctaBtnSecondary]}
@@ -182,5 +207,6 @@ const styles = StyleSheet.create({
   ctaBtn: { backgroundColor: '#16a34a', borderRadius: 10, padding: 16, alignItems: 'center' },
   ctaBtnSecondary: { backgroundColor: '#f59e0b' },
   ctaBtnLeave: { backgroundColor: '#dc2626', borderRadius: 10, padding: 16, alignItems: 'center' },
+  ctaBtnCancel: { backgroundColor: '#dc2626', borderRadius: 10, padding: 16, alignItems: 'center', marginTop: 8 },
   ctaText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });
