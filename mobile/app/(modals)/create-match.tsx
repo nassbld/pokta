@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  TextInput, Alert, ActivityIndicator, Platform,
+  TextInput, Alert, ActivityIndicator, Platform, FlatList,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
 import { useCreateMatch, CreateMatchPayload } from '../../hooks/useCreateMatch';
+import { useVenueSearch, VenueSuggestion } from '../../hooks/useVenueSearch';
 
 const FORMATS: CreateMatchPayload['format'][] = ['5v5', '7v7', '11v11'];
 const LEVELS: { value: CreateMatchPayload['level']; label: string }[] = [
@@ -30,6 +31,9 @@ export default function CreateMatchScreen() {
   const [description, setDescription] = useState('');
   const [prix, setPrix] = useState('');
   const [joinMatch, setJoinMatch] = useState(true);
+  const [venueQuery, setVenueQuery] = useState('');
+  const [selectedVenue, setSelectedVenue] = useState<VenueSuggestion | null>(null);
+  const { results: venueSuggestions, isLoading: venueLoading } = useVenueSearch(selectedVenue ? '' : venueQuery);
 
   async function handleSubmit() {
     const max = parseInt(maxPlayers, 10);
@@ -60,6 +64,12 @@ export default function CreateMatchScreen() {
         lat: loc.coords.latitude,
         lng: loc.coords.longitude,
         join_as_participant: joinMatch,
+        venue: selectedVenue ? {
+          name: selectedVenue.name,
+          address: selectedVenue.display_name,
+          lat: parseFloat(selectedVenue.lat),
+          lng: parseFloat(selectedVenue.lon),
+        } : null,
       });
       router.back();
     } catch (e: any) {
@@ -158,6 +168,47 @@ export default function CreateMatchScreen() {
         placeholder="0.00"
       />
 
+      {/* Terrain */}
+      <Text style={styles.label}>Terrain (optionnel)</Text>
+      {selectedVenue ? (
+        <View style={styles.selectedVenue}>
+          <View style={styles.selectedVenueText}>
+            <Text style={styles.selectedVenueName}>{selectedVenue.name}</Text>
+            <Text style={styles.selectedVenueAddress} numberOfLines={1}>{selectedVenue.display_name}</Text>
+          </View>
+          <TouchableOpacity onPress={() => { setSelectedVenue(null); setVenueQuery(''); }}>
+            <Text style={styles.venueRemove}>✕</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View>
+          <TextInput
+            style={styles.input}
+            placeholder="Rechercher un terrain..."
+            value={venueQuery}
+            onChangeText={setVenueQuery}
+          />
+          {venueLoading && <ActivityIndicator size="small" color="#16a34a" style={{ marginTop: 8 }} />}
+          {venueSuggestions.length > 0 && (
+            <FlatList
+              data={venueSuggestions}
+              keyExtractor={(item) => String(item.place_id)}
+              scrollEnabled={false}
+              keyboardShouldPersistTaps="handled"
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.suggestion}
+                  onPress={() => { setSelectedVenue(item); setVenueQuery(''); }}
+                >
+                  <Text style={styles.suggestionName}>{item.name}</Text>
+                  <Text style={styles.suggestionAddress} numberOfLines={1}>{item.display_name}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          )}
+        </View>
+      )}
+
       {/* Participation */}
       <TouchableOpacity style={styles.toggleRow} onPress={() => setJoinMatch((v) => !v)}>
         <View style={[styles.toggleBox, joinMatch && styles.toggleBoxActive]}>
@@ -187,6 +238,14 @@ const styles = StyleSheet.create({
   textarea: { height: 80, textAlignVertical: 'top' },
   dateBtn: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, flex: 1 },
   dateBtnText: { fontSize: 14, color: '#333', textAlign: 'center' },
+  selectedVenue: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#16a34a', borderRadius: 8, padding: 12, gap: 8 },
+  selectedVenueText: { flex: 1 },
+  selectedVenueName: { fontSize: 14, fontWeight: '600', color: '#111' },
+  selectedVenueAddress: { fontSize: 12, color: '#888', marginTop: 2 },
+  venueRemove: { fontSize: 16, color: '#999', paddingHorizontal: 4 },
+  suggestion: { paddingVertical: 10, paddingHorizontal: 12, borderBottomWidth: 1, borderBottomColor: '#f0f0f0', backgroundColor: '#fff' },
+  suggestionName: { fontSize: 14, fontWeight: '500', color: '#111' },
+  suggestionAddress: { fontSize: 12, color: '#888', marginTop: 2 },
   toggleRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 24 },
   toggleBox: { width: 24, height: 24, borderRadius: 6, borderWidth: 2, borderColor: '#ddd', alignItems: 'center', justifyContent: 'center' },
   toggleBoxActive: { backgroundColor: '#16a34a', borderColor: '#16a34a' },
