@@ -68,7 +68,7 @@ export default function MatchsScreen() {
         }
         ListHeaderComponent={<Text style={styles.heading}>Matchs à proximité</Text>}
       />
-      <TouchableOpacity style={styles.fab} onPress={() => router.push('/create-match')}>
+      <TouchableOpacity style={styles.fab} onPress={() => router.push('/(modals)/create-match')}>
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
     </View>

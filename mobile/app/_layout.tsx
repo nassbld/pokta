@@ -28,10 +28,7 @@ export default function RootLayout() {
         <Stack.Screen name="index" />
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen
-          name="create-match"
-          options={{ presentation: 'modal', title: 'Créer un match', headerShown: true, headerTintColor: '#16a34a' }}
-        />
+        <Stack.Screen name="(modals)" options={{ headerShown: false }} />
       </Stack>
     </QueryClientProvider>
   );
