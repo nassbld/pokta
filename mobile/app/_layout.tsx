@@ -29,6 +29,7 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="(modals)" options={{ headerShown: false }} />
+        <Stack.Screen name="match/[id]" options={{ title: 'Match', headerShown: true, headerTintColor: '#16a34a' }} />
       </Stack>
     </QueryClientProvider>
   );

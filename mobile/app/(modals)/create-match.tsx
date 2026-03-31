@@ -6,7 +6,7 @@ import {
 import { useRouter } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
-import { useCreateMatch, CreateMatchPayload } from '../hooks/useCreateMatch';
+import { useCreateMatch, CreateMatchPayload } from '../../hooks/useCreateMatch';
 
 const FORMATS: CreateMatchPayload['format'][] = ['5v5', '7v7', '11v11'];
 const LEVELS: { value: CreateMatchPayload['level']; label: string }[] = [

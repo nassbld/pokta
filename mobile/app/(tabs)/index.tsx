@@ -59,7 +59,7 @@ export default function MatchsScreen() {
         contentContainerStyle={styles.content}
         data={matches}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <MatchCard match={item} />}
+        renderItem={({ item }) => <MatchCard match={item} onPress={() => router.push(`/match/${item.id}`)} />}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#16a34a" />}
         ListEmptyComponent={
           <View style={styles.centered}>
