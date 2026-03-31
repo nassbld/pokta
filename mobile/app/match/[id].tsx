@@ -127,10 +127,10 @@ export default function MatchDetailScreen() {
             Joueurs ({confirmed.length}/{match.max_players})
           </Text>
           {confirmed.map((p) => (
-            <View key={p.id} style={styles.playerRow}>
+            <TouchableOpacity key={p.id} style={styles.playerRow} onPress={() => router.push(`/player/${p.user.id}`)}>
               <Text style={styles.playerName}>{p.user.username}</Text>
               {p.user.position && <Text style={styles.playerPosition}>{p.user.position}</Text>}
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
 
@@ -138,9 +138,9 @@ export default function MatchDetailScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Liste d'attente ({waiting.length})</Text>
             {waiting.map((p) => (
-              <View key={p.id} style={styles.playerRow}>
+              <TouchableOpacity key={p.id} style={styles.playerRow} onPress={() => router.push(`/player/${p.user.id}`)}>
                 <Text style={[styles.playerName, { color: '#999' }]}>{p.user.username}</Text>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         )}
