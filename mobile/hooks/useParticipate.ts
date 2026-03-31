@@ -10,7 +10,10 @@ export function useJoinMatch(matchId: string) {
     mutationFn: async () => {
       const { error } = await supabase
         .from('participations')
-        .insert({ match_id: matchId, user_id: user!.id, statut: 'confirme' });
+        .upsert(
+          { match_id: matchId, user_id: user!.id, statut: 'confirme' },
+          { onConflict: 'match_id,user_id' }
+        );
       if (error) throw error;
     },
     onSuccess: () => {
