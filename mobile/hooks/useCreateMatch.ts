@@ -26,6 +26,12 @@ export function useCreateMatch() {
         location: `POINT(${lng} ${lat})`,
       }).select().single();
       if (error) throw error;
+
+      const { error: participationError } = await supabase
+        .from('participations')
+        .insert({ match_id: data.id, user_id: user!.id, statut: 'confirme' });
+      if (participationError) throw participationError;
+
       return data;
     },
     onSuccess: () => {
