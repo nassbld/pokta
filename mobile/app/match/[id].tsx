@@ -158,24 +158,26 @@ export default function MatchDetailScreen() {
           </TouchableOpacity>
         )}
 
-          {!myParticipation ? (
-            <TouchableOpacity
-              style={[styles.ctaBtn, isFull && styles.ctaBtnSecondary]}
-              onPress={handleJoin}
-              disabled={join.isPending}
-            >
-              {join.isPending
-                ? <ActivityIndicator color="#fff" />
-                : <Text style={styles.ctaText}>{isFull ? "Rejoindre la liste d'attente" : 'Rejoindre le match'}</Text>
-              }
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.ctaBtnLeave} onPress={handleLeave} disabled={leave.isPending}>
-              {leave.isPending
-                ? <ActivityIndicator color="#fff" />
-                : <Text style={styles.ctaText}>Quitter le match</Text>
-              }
-            </TouchableOpacity>
+          {match.status !== 'annule' && match.status !== 'termine' && (
+            !myParticipation ? (
+              <TouchableOpacity
+                style={[styles.ctaBtn, isFull && styles.ctaBtnSecondary]}
+                onPress={handleJoin}
+                disabled={join.isPending}
+              >
+                {join.isPending
+                  ? <ActivityIndicator color="#fff" />
+                  : <Text style={styles.ctaText}>{isFull ? "Rejoindre la liste d'attente" : 'Rejoindre le match'}</Text>
+                }
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={styles.ctaBtnLeave} onPress={handleLeave} disabled={leave.isPending}>
+                {leave.isPending
+                  ? <ActivityIndicator color="#fff" />
+                  : <Text style={styles.ctaText}>Quitter le match</Text>
+                }
+              </TouchableOpacity>
+            )
           )}
       </View>
     </View>
