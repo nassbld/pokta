@@ -11,6 +11,7 @@ export interface CreateMatchPayload {
   prix_par_joueur?: number | null;
   lat: number;
   lng: number;
+  join_as_participant?: boolean;
 }
 
 export function useCreateMatch() {
@@ -19,7 +20,7 @@ export function useCreateMatch() {
 
   return useMutation({
     mutationFn: async (payload: CreateMatchPayload) => {
-      const { lat, lng, ...rest } = payload;
+      const { lat, lng, join_as_participant, ...rest } = payload;
       const { data, error } = await supabase.from('matches').insert({
         ...rest,
         creator_id: user!.id,
@@ -27,10 +28,12 @@ export function useCreateMatch() {
       }).select().single();
       if (error) throw error;
 
-      const { error: participationError } = await supabase
-        .from('participations')
-        .insert({ match_id: data.id, user_id: user!.id, statut: 'confirme' });
-      if (participationError) throw participationError;
+      if (join_as_participant) {
+        const { error: participationError } = await supabase
+          .from('participations')
+          .insert({ match_id: data.id, user_id: user!.id, statut: 'confirme' });
+        if (participationError) throw participationError;
+      }
 
       return data;
     },

@@ -132,8 +132,7 @@ export default function MatchDetailScreen() {
       </ScrollView>
 
       {/* CTA */}
-      {!isCreator && (
-        <View style={styles.footer}>
+      <View style={styles.footer}>
           {!myParticipation ? (
             <TouchableOpacity
               style={[styles.ctaBtn, isFull && styles.ctaBtnSecondary]}
@@ -153,8 +152,7 @@ export default function MatchDetailScreen() {
               }
             </TouchableOpacity>
           )}
-        </View>
-      )}
+      </View>
     </View>
   );
 }

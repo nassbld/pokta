@@ -29,6 +29,7 @@ export default function CreateMatchScreen() {
   const [level, setLevel] = useState<CreateMatchPayload['level']>(null);
   const [description, setDescription] = useState('');
   const [prix, setPrix] = useState('');
+  const [joinMatch, setJoinMatch] = useState(true);
 
   async function handleSubmit() {
     const max = parseInt(maxPlayers, 10);
@@ -58,6 +59,7 @@ export default function CreateMatchScreen() {
         prix_par_joueur: prix ? parseFloat(prix) : null,
         lat: loc.coords.latitude,
         lng: loc.coords.longitude,
+        join_as_participant: joinMatch,
       });
       router.back();
     } catch (e: any) {
@@ -156,6 +158,14 @@ export default function CreateMatchScreen() {
         placeholder="0.00"
       />
 
+      {/* Participation */}
+      <TouchableOpacity style={styles.toggleRow} onPress={() => setJoinMatch((v) => !v)}>
+        <View style={[styles.toggleBox, joinMatch && styles.toggleBoxActive]}>
+          {joinMatch && <Text style={styles.toggleCheck}>✓</Text>}
+        </View>
+        <Text style={styles.toggleLabel}>Je participe à ce match</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} disabled={isPending}>
         {isPending ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>Créer le match</Text>}
       </TouchableOpacity>
@@ -177,6 +187,11 @@ const styles = StyleSheet.create({
   textarea: { height: 80, textAlignVertical: 'top' },
   dateBtn: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 12, flex: 1 },
   dateBtnText: { fontSize: 14, color: '#333', textAlign: 'center' },
+  toggleRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 24 },
+  toggleBox: { width: 24, height: 24, borderRadius: 6, borderWidth: 2, borderColor: '#ddd', alignItems: 'center', justifyContent: 'center' },
+  toggleBoxActive: { backgroundColor: '#16a34a', borderColor: '#16a34a' },
+  toggleCheck: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  toggleLabel: { fontSize: 15, color: '#333' },
   submitBtn: { backgroundColor: '#16a34a', borderRadius: 10, padding: 16, alignItems: 'center', marginTop: 32 },
   submitText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });
